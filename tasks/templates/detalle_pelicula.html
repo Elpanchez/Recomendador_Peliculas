@@ -1,0 +1,170 @@
+{% extends 'base.html' %}
+
+{% block title %} {{ pelicula.titulo }} | MovieHub {% endblock %}
+
+{% block content %}
+<div class="containerBox">
+    <div class="row">
+        <!-- Columna izquierda: Imagen de la película -->
+        <div class="col s12 m4">
+            <div class="card">
+                <div class="card-image">
+                    <img src="{{ pelicula.imagen }}" alt="{{ pelicula.titulo }}">
+                </div>
+                {% if user.is_authenticated %}
+                <div class="card-action center-align">
+                    <form method="POST" action="{% url 'guardar_interaccion' %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="pelicula" value="{{ pelicula_id }}">
+                        <input type="hidden" name="accion" value="guardar">
+                        <button type="submit" class="btn purple darken-1 waves-effect waves-light">
+                            <i class="material-icons left">favorite</i>Agregar a favoritos
+                        </button>
+                    </form>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Columna derecha: Información de la película -->
+        <div class="col s12 m8">
+            <div class="card">
+                <div class="card-content">
+                    <span class="card-title purple-text text-darken-2">{{ pelicula.titulo }}</span>
+                    <div class="divider"></div>
+                    
+                    <div class="section">
+                        <p class="flow-text">{{ pelicula.descripcion }}</p>
+                    </div>
+                    
+                    <div class="section">
+                        <div class="row">
+                            <div class="col s12 m6">
+                                <p><strong>Género:</strong> {{ pelicula.genero }}</p>
+                                <p><strong>Director:</strong> {{ pelicula.director }}</p>
+                                <p><strong>Año:</strong> {{ pelicula.año }}</p>
+                            </div>
+                            <div class="col s12 m6">
+                                <p><strong>Duración:</strong> {{ pelicula.duracion }}</p>
+                                <p>
+                                    <strong>Calificación:</strong> 
+                                    {% if calificacion_promedio %}
+                                        {{ calificacion_promedio }}/10 (Usuarios)
+                                    {% else %}
+                                        {{ pelicula.calificacion }} (IMDB)
+                                    {% endif %}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    {% if user.is_authenticated %}
+                    <div class="section">
+                        <div class="divider"></div>
+                        <h5>¿Qué te pareció esta película?</h5>
+                        
+                        <!-- Pestañas para diferentes acciones -->
+                        <div class="row">
+                            <div class="col s12">
+                                <ul class="tabs">
+                                    <li class="tab col s6"><a href="#calificar" class="active purple-text text-darken-2">Calificar</a></li>
+                                    <li class="tab col s6"><a href="#resenar" class="purple-text text-darken-2">Escribir Reseña</a></li>
+                                </ul>
+                            </div>
+                            
+                            <!-- Pestaña para calificar -->
+                            <div id="calificar" class="col s12">
+                                <div class="card-panel">
+                                    <form method="POST" action="{% url 'guardar_interaccion' %}">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="pelicula" value="{{ pelicula_id }}">
+                                        <input type="hidden" name="accion" value="calificar">
+                                        
+                                        <p class="range-field">
+                                            <label>Tu calificación (1-10):</label>
+                                            <input type="range" name="calificacion" min="1" max="10" value="8" />
+                                        </p>
+                                        
+                                        <div class="center-align">
+                                            <button type="submit" class="btn purple darken-1 waves-effect waves-light">
+                                                <i class="material-icons left">star</i>Enviar Calificación
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                            
+                            <!-- Pestaña para escribir reseña -->
+                            <div id="resenar" class="col s12">
+                                <div class="card-panel">
+                                    <form method="POST" action="{% url 'guardar_interaccion' %}">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="pelicula" value="{{ pelicula_id }}">
+                                        <input type="hidden" name="accion" value="reseñar">
+                                        
+                                        <div class="input-field">
+                                            <textarea id="reseña" name="reseña" class="materialize-textarea" required></textarea>
+                                            <label for="reseña">Tu opinión sobre la película</label>
+                                        </div>
+                                        
+                                        <div class="center-align">
+                                            <button type="submit" class="btn purple darken-1 waves-effect waves-light">
+                                                <i class="material-icons left">rate_review</i>Publicar Reseña
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Sección de reseñas -->
+    <div class="row">
+        <div class="col s12">
+            <div class="card">
+                <div class="card-content">
+                    <span class="card-title purple-text text-darken-2">Reseñas de usuarios</span>
+                    <div class="divider"></div>
+                    
+                    {% if reseñas %}
+                        {% for reseña in reseñas %}
+                            <div class="section">
+                                <div class="card-panel grey lighten-4">
+                                    <p class="flow-text">{{ reseña.reseña }}</p>
+                                    <div class="right-align">
+                                        <small class="grey-text">{{ reseña.fecha_creacion|default:"" }}</small>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="section center-align">
+                            <p>No hay reseñas para esta película todavía. ¡Sé el primero en opinar!</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Botón para volver -->
+    <div class="row center-align">
+        <a href="{% url 'home' %}" class="btn-large purple lighten-1 waves-effect waves-light">
+            <i class="material-icons left">arrow_back</i>Volver al inicio
+        </a>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Inicializar pestañas
+        var tabs = document.querySelectorAll('.tabs');
+        var tabsInstance = M.Tabs.init(tabs);
+    });
+</script>
+{% endblock %}
