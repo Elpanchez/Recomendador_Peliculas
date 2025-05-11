@@ -21,7 +21,7 @@ def signup(request):
             if form.is_valid():
                 user = form.save()
                 login(request, user)
-                return redirect('tasks')
+                return redirect('home')
             else:
                 return render(request, 'signup.html', {"form": form, "error": "Error en el registro. Revisa los datos ingresados."})
         except Exception as e:
@@ -101,7 +101,7 @@ def signin(request):
             if form.is_valid():
                 user = form.get_user()
                 login(request, user)
-                return redirect('tasks')
+                return redirect('home')
             else:
                 return render(request, 'signin.html', {"form": form, "error": "Usuario o contraseña incorrectos."})
         except Exception as e:
