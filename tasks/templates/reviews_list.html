@@ -1,10 +1,10 @@
 {% extends 'base.html' %}
 
-{% block title %}Reseñas | MovieHub{% endblock %}
+{% block title %}Mis Reseñas | MovieHub{% endblock %}
 
 {% block content %}
 <div class="containerBox">
-    <h1 class="page-title">Lista de Reseñas</h1>
+    <h1 class="page-title">Mis Reseñas</h1>
     
     {% if reviews %}
     <div class="reviews-grid">
@@ -12,42 +12,54 @@
             <div class="review-card" id="review-{{ review.id }}">
                 <div class="review-header">
                     <h3 class="movie-title">{{ review.titulo_pelicula }}</h3>
-                    <div class="rating-badge">
-                        {% if review.calificacion is not None %}
+                    <div class="review-meta">
+                        <span class="review-date">{{ review.fecha_creacion|date:"d M Y" }}</span>
+                        {% if review.calificacion %}
+                        <div class="rating-badge">
                             <span>{{ review.calificacion }}/10</span>
-                        {% else %}
-                            <span>N/A</span>
+                        </div>
                         {% endif %}
                     </div>
                 </div>
                 
                 <div class="review-content">
-                    <div class="review-label">Acción:</div>
-                    <div class="review-info">{{ review.accion }}</div>
-                    
-                    <div class="review-label">Reseña:</div>
-                    <div class="review-info" id="review-text-{{ review.id }}">{{ review.reseña }}</div>
+                    <div class="review-text" id="review-text-{{ review.id }}">
+                        {{ review.reseña|linebreaks }}
+                    </div>
                 </div>
                 
                 <div class="review-actions">
                     <button class="btn-edit" onclick="toggleEditForm('{{ review.id }}')">
                         <i class="material-icons">edit</i> Editar
                     </button>
-                    <button class="btn-danger" onclick="confirmDelete('{{ review.id }}', '{{ review.titulo_pelicula }}')">
+                    <button class="btn-danger" onclick="confirmDelete('{{ review.id }}', '{{ review.titulo_pelicula|escapejs }}')">
                         <i class="material-icons">delete</i> Borrar
                     </button>
                 </div>
                 
-                <div id="edit-form-{{ review.id }}" class="edit-form">
+                <div id="edit-form-{{ review.id }}" class="edit-form" style="display: none;">
                     <form method="post" action="{% url 'update_review' review.id %}">
                         {% csrf_token %}
-                        <textarea name="reseña" rows="4" class="review-textarea">{{ review.reseña }}</textarea>
+                        <div class="input-field">
+                            <textarea id="edit-textarea-{{ review.id }}" name="reseña" class="materialize-textarea">{{ review.reseña }}</textarea>
+                            <label for="edit-textarea-{{ review.id }}">Tu reseña</label>
+                        </div>
+                        <div class="input-field">
+                            <select name="calificacion">
+                                <option value="" disabled {% if not review.calificacion %}selected{% endif %}>Calificación</option>
+                                {% for i in "x"|rjust:"10" %}
+                                <option value="{{ forloop.counter }}" {% if review.calificacion == forloop.counter %}selected{% endif %}>
+                                    {{ forloop.counter }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
                         <div class="form-actions">
-                            <button type="submit" class="btn-save">
-                                <i class="material-icons">save</i> Guardar
+                            <button type="submit" class="btn-save waves-effect waves-light">
+                                <i class="material-icons left">save</i> Guardar
                             </button>
-                            <button type="button" class="btn-cancel" onclick="toggleEditForm('{{ review.id }}')">
-                                <i class="material-icons">close</i> Cancelar
+                            <button type="button" class="btn-cancel waves-effect waves-light" onclick="toggleEditForm('{{ review.id }}')">
+                                <i class="material-icons left">close</i> Cancelar
                             </button>
                         </div>
                     </form>
@@ -57,35 +69,29 @@
     </div>
     {% else %}
         <div class="empty-state">
-            <i class="material-icons empty-icon">movie</i>
-            <p>No hay reseñas disponibles.</p>
+            <i class="material-icons empty-icon">rate_review</i>
+            <h3>Aún no has creado reseñas</h3>
+            <p>Cuando crees reseñas sobre películas, aparecerán aquí.</p>
+            <a href="{% url 'home' %}" class="btn waves-effect waves-light">
+                <i class="material-icons left">movie</i>Explorar películas
+            </a>
         </div>
     {% endif %}
-    
-    <div class="form-buttons">
-        <a href="{% url 'home' %}" class="btn btn-secondary">
-            <i class="material-icons left">home</i>Volver al Inicio
-        </a>
-    </div>
 </div>
 
-<!-- Modal de confirmación de eliminación -->
+<!-- Modal de confirmación -->
 <div id="deleteModal" class="modal">
     <div class="modal-content">
-        <span class="close-modal" onclick="closeDeleteModal()">&times;</span>
-        <div class="modal-header">
-            <i class="material-icons warning-icon">warning</i>
-            <h2>Confirmar Eliminación</h2>
-        </div>
+        <h4>Confirmar eliminación</h4>
         <p id="delete-message">¿Estás seguro de que deseas eliminar esta reseña?</p>
-        <div class="modal-actions">
-            <a id="confirm-delete-btn" href="#" class="btn-confirm-delete">
-                <i class="material-icons">delete_forever</i> Eliminar
-            </a>
-            <button onclick="closeDeleteModal()" class="btn-cancel-delete">
-                <i class="material-icons">cancel</i> Cancelar
-            </button>
-        </div>
+    </div>
+    <div class="modal-footer">
+        <a id="confirm-delete-btn" href="#" class="btn-flat red-text">
+            <i class="material-icons left">delete_forever</i>Eliminar
+        </a>
+        <a href="#!" class="modal-close btn-flat">
+            <i class="material-icons left">cancel</i>Cancelar
+        </a>
     </div>
 </div>
 

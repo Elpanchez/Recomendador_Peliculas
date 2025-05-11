@@ -21,7 +21,7 @@ def signup(request):
             if form.is_valid():
                 user = form.save()
                 login(request, user)
-                return redirect('tasks')
+                return redirect('home')
             else:
                 return render(request, 'signup.html', {"form": form, "error": "Error en el registro. Revisa los datos ingresados."})
         except Exception as e:
@@ -101,7 +101,7 @@ def signin(request):
             if form.is_valid():
                 user = form.get_user()
                 login(request, user)
-                return redirect('tasks')
+                return redirect('home')
             else:
                 return render(request, 'signin.html', {"form": form, "error": "Usuario o contraseña incorrectos."})
         except Exception as e:
@@ -392,14 +392,17 @@ def guardar_interaccion(request):
 #Aqui acaba
 @login_required
 def reviews_list(request):
-    # Obtener las reseñas del usuario actual (interacciones con reseña no vacía)
-    reviews = Interaccion.objects.filter(user=request.user).exclude(reseña__isnull=True).exclude(reseña="")
+    # Obtener solo las reseñas del usuario actual (interacciones con reseña no vacía)
+    user_reviews = Interaccion.objects.filter(
+        user=request.user,
+        accion="reseñar"
+    ).exclude(reseña__isnull=True).exclude(reseña="").order_by('-fecha_creacion')
     
-    # Crear una lista para almacenar las reseñas con información adicional
+    # Lista para almacenar las reseñas con información completa
     enhanced_reviews = []
     
-    # Diccionario para mapear IDs por defecto a títulos de películas
-    titulos_muestra = {
+    # Diccionario de películas de muestra (puedes mover esto a settings.py si es usado en varios lugares)
+    SAMPLE_MOVIES = {
         'default-1': 'Interestelar',
         'default-2': 'Titanic',
         'default-3': 'El Padrino',
@@ -415,37 +418,37 @@ def reviews_list(request):
         'default-13': 'Spiderman into the Spiderverse'
     }
     
-    # Para cada reseña, intentar obtener el título de la película
-    for review in reviews:
-        # Crear un diccionario con la información de la reseña
-        review_data = {
-            'id': review.id,
-            'pelicula_id': review.pelicula_id,
-            'accion': review.accion,
-            'reseña': review.reseña,
-            'calificacion': review.calificacion,
-            'titulo_pelicula': 'Película Desconocida'  # Valor por defecto
-        }
+    # Prefetch películas reales para optimizar consultas
+    real_movie_ids = [r.pelicula_id for r in user_reviews if not r.pelicula_id.startswith('default-') and r.pelicula_id.isdigit()]
+    real_movies = Pelicula.objects.filter(id__in=real_movie_ids).in_bulk()
+    
+    for review in user_reviews:
+        movie_title = SAMPLE_MOVIES.get(review.pelicula_id, 'Película Desconocida')
         
-        # Intentar obtener el título de la película
-        if review.pelicula_id.startswith('default-'):
-            # Es una película de muestra
-            review_data['titulo_pelicula'] = titulos_muestra.get(review.pelicula_id, 'Película Desconocida')
-        else:
-            # Intentar obtener la película de la base de datos
+        # Si no es película de muestra, buscar en la base de datos
+        if not review.pelicula_id.startswith('default-'):
             try:
-                # Solo intentar obtener de la base de datos si no es un ID por defecto
-                # y si parece ser un número válido
-                if not review.pelicula_id.startswith('default-') and review.pelicula_id.isdigit():
-                    pelicula = Pelicula.objects.get(id=int(review.pelicula_id))
-                    review_data['titulo_pelicula'] = pelicula.titulo
-            except (Pelicula.DoesNotExist, ValueError):
-                # Si la película no existe o el ID no es válido, dejar el valor por defecto
+                movie_id = int(review.pelicula_id)
+                movie = real_movies.get(movie_id)
+                if movie:
+                    movie_title = movie.titulo
+            except (ValueError, KeyError):
                 pass
         
-        enhanced_reviews.append(review_data)
+        enhanced_reviews.append({
+            'id': review.id,
+            'pelicula_id': review.pelicula_id,
+            'titulo_pelicula': movie_title,
+            'reseña': review.reseña,
+            'calificacion': review.calificacion,
+            'fecha_creacion': review.fecha_creacion,
+            'es_editable': True  # Todas son editables porque son del usuario actual
+        })
     
-    return render(request, 'reviews_list.html', {'reviews': enhanced_reviews})
+    return render(request, 'reviews_list.html', {
+        'reviews': enhanced_reviews,
+        'username': request.user.username
+    })
 
 @login_required
 def delete_review(request, review_id):
