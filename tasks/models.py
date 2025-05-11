@@ -12,6 +12,7 @@ class Pelicula(models.Model):
 
 class Reseña(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)  # ID aleatorio único
+    usuario = models.ForeignKey(User, on_delete=models.CASCADE)
     pelicula = models.ForeignKey(Pelicula, on_delete=models.CASCADE)
     comentario = models.TextField()
     fecha_creacion = models.DateTimeField(auto_now_add=True)  # Fecha automática al crear
@@ -19,11 +20,13 @@ class Reseña(models.Model):
 
 class Calificacion(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)  # ID aleatorio único
+    usuario = models.ForeignKey(User, on_delete=models.CASCADE)
     pelicula = models.ForeignKey(Pelicula, on_delete=models.CASCADE)
     calificacion = models.IntegerField(choices=[(i, str(i)) for i in range(1, 11)])
 
 class Favorito(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)  # ID aleatorio único
+    usuario = models.ForeignKey(User, on_delete=models.CASCADE)
     pelicula = models.ForeignKey(Pelicula, on_delete=models.CASCADE)
     fecha_agregado = models.DateTimeField(auto_now_add=True)
     from django.db import models
