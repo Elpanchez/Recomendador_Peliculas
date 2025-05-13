@@ -27,6 +27,7 @@ from django.contrib.auth.views import LoginView
 
 
 from tasks.views import reviews_list, delete_review, update_review, eliminar_favorito
+from tasks.views import configurar_perfil, eliminar_favorito, eliminar_favorito_modelo
 
 urlpatterns = [
     path('', views.home, name='home'),
@@ -50,6 +51,9 @@ urlpatterns = [
     path('reviews/update/<str:review_id>/', update_review, name='update_review'),
     path('pelicula/<str:pelicula_id>/', views.detalle_pelicula, name='detalle_pelicula'),
     path('favoritos/eliminar/<str:pelicula_id>/', eliminar_favorito, name='eliminar_favorito'),
+    path('configurar-perfil/', configurar_perfil, name='configurar_perfil'),
+    path('favoritos/eliminar/<int:pelicula_id>/', eliminar_favorito, name='eliminar_favorito'),
+    path('favoritos-modelo/eliminar/<int:favorito_id>/', eliminar_favorito_modelo, name='eliminar_favorito_modelo'),
 ]
 
 if settings.DEBUG:  # Solo en modo desarrollo

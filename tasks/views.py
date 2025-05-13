@@ -8,6 +8,10 @@ from django.contrib.auth.decorators import login_required
 from .models import Task
 
 from .forms import TaskForm
+#para cambiar el password
+from .forms import UserUpdateForm
+from django.contrib.auth.forms import PasswordChangeForm
+from django.contrib.auth import update_session_auth_hash
 
 # Create your views here.
 
@@ -632,6 +636,79 @@ def update_review(request, review_id):
         else:
             messages.error(request, "La reseña no puede estar vacía.")
     return redirect('reviews_list')
+
+#Configurar perfil
+@login_required
+def configurar_perfil(request):
+    # Obtener ambos modelos de favoritos
+    favoritos_interaccion = Interaccion.objects.filter(
+        user=request.user, 
+        accion='guardar'
+    ).select_related('pelicula')
+    
+    favoritos_model = Favorito.objects.filter(
+        usuario=request.user
+    ).select_related('pelicula')
+
+    if request.method == 'POST':
+        user_form = UserUpdateForm(request.POST, instance=request.user)
+        password_form = PasswordChangeForm(request.user, request.POST)
+        
+        if 'update_profile' in request.POST:
+            if user_form.is_valid():
+                user_form.save()
+                messages.success(request, 'Tu perfil ha sido actualizado!')
+                return redirect('configurar_perfil')
+                
+        elif 'change_password' in request.POST:
+            if password_form.is_valid():
+                user = password_form.save()
+                update_session_auth_hash(request, user)  # Importante para no desloguear
+                messages.success(request, 'Tu contraseña ha sido cambiada!')
+                return redirect('configurar_perfil')
+            else:
+                messages.error(request, 'Por favor corrige los errores.')
+    else:
+        user_form = UserUpdateForm(instance=request.user)
+        password_form = PasswordChangeForm(request.user)
+
+    context = {
+        'user_form': user_form,
+        'password_form': password_form,
+        'favoritos_interaccion': favoritos_interaccion,
+        'favoritos_model': favoritos_model,
+    }
+    
+    return render(request, 'configurar_perfil.html', context)
+
+
+@login_required
+def eliminar_favorito(request, pelicula_id):
+    """Elimina favorito del modelo Interaccion"""
+    if request.method == 'POST':
+        favorito = get_object_or_404(
+            Interaccion, 
+            user=request.user, 
+            pelicula_id=pelicula_id, 
+            accion='guardar'
+        )
+        favorito.delete()
+        messages.success(request, 'Película eliminada de favoritos')
+    return redirect('configurar_perfil')
+
+@login_required
+def eliminar_favorito_modelo(request, favorito_id):
+    """Elimina favorito del modelo Favorito"""
+    if request.method == 'POST':
+        favorito = get_object_or_404(
+            Favorito, 
+            usuario=request.user, 
+            id=favorito_id
+        )
+        favorito.delete()
+        messages.success(request, 'Película eliminada de favoritos')
+    return redirect('configurar_perfil')
+
 
 @login_required
 def eliminar_favorito(request, pelicula_id):
