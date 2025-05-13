@@ -248,133 +248,226 @@
 
     <!-- Script para cargar datos de la API -->
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const apiKey = "a5c892bf"; // Clave API de OMDb
-            const trendingIds = ["tt0111161", "tt0068646", "tt0468569", "tt1375666", "tt0109830", "tt0137523", "tt0120737", "tt0167260", "tt0080684", "tt0133093"]; // Top 10 IMDb
+    document.addEventListener('DOMContentLoaded', function() {
+        const apiKey = "a5c892bf"; // Clave API de OMDb
+        // Lista ampliada de películas actualizadas (2021-2023) con más variedad
+        const trendingIds = [
+            "tt15398776", // Oppenheimer (2023)
+            "tt1517268",  // Barbie (2023)
+            "tt10872600", // Spider-Man: No Way Home (2021)
+            "tt9114286",  // Black Panther: Wakanda Forever (2022)
+            "tt10648342", // Thor: Love and Thunder (2022)
+            "tt13623148", // The Batman (2022)
+            "tt9419884",  // Doctor Strange 2 (2022)
+            "tt10298810", // Lightyear (2022)
+            "tt1464335",  // Uncharted (2022)
+            "tt12530246", // Everything Everywhere All at Once (2022)
+            "tt10366460", // CODA (2021)
+            "tt11271038", // Licorice Pizza (2021)
+            "tt9620292",  // Promising Young Woman (2021)
+            "tt10838180", // The Matrix Resurrections (2021)
+            "tt9032400",  // Eternals (2021)
+            "tt1160419",  // Dune (2021)
+            "tt11286314", // Don't Look Up (2021)
+            "tt4244994",  // The Last Duel (2021)
+            "tt10954600", // Ant-Man 3 (2023)
+            "tt6710474",  // Everything Everywhere All at Once (2022)
+            "tt13560574", // X (2022)
+            "tt13320622", // The Lost City (2022)
+            "tt12593682", // Bullet Train (2022)
+            "tt13352968", // Elvis (2022)
+            "tt10223460", // Top Gun: Maverick (2022)
+            "tt10648342", // Thor: Love and Thunder (2022)
+            "tt4513678",  // Ghostbusters: Afterlife (2021)
+            "tt11214590", // House of Gucci (2021)
+            "tt3581652",  // West Side Story (2021)
+            "tt11271038"  // Licorice Pizza (2021)
+        ];
+        
+        // IDs para recomendaciones personalizadas (películas más recientes y variadas)
+        const recommendationIds = [
+            "tt15398776", // Oppenheimer
+            "tt1517268",  // Barbie
+            "tt6710474",  // Everything Everywhere All at Once
+            "tt12530246", // The Fabelmans
+            "tt10304142", // Avatar: The Way of Water
+            "tt13560574", // X
+            "tt13320622", // The Lost City
+            "tt12593682", // Bullet Train
+            "tt13352968", // Elvis
+            "tt10223460", // Top Gun: Maverick
+            "tt10648342", // Thor: Love and Thunder
+            "tt4513678",  // Ghostbusters: Afterlife
+            "tt11214590", // House of Gucci
+            "tt3581652",  // West Side Story
+            "tt11271038"  // Licorice Pizza
+        ];
+        
+        // Función para mezclar array aleatoriamente
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+        
+        // Mezclar los arrays para mostrar películas aleatorias
+        const shuffledTrending = shuffleArray([...trendingIds]);
+        const shuffledRecommendations = shuffleArray([...recommendationIds]);
+        
+        // Cargar películas recomendadas (ahora 6 en lugar de 2)
+        loadMovies('api-recommendations', shuffledRecommendations, true, 6);
+        
+        // Cargar películas en tendencia (ahora 12 en lugar de 4)
+        loadMovies('api-trending', shuffledTrending, false, 12);
+        
+        function loadMovies(containerId, movieIds, isRecommended, limit) {
+            const container = document.getElementById(containerId);
+            let htmlContent = '';
             
-            // IDs para recomendaciones personalizadas (podrían venir de la base de datos según preferencias del usuario)
-            const recommendationIds = ["tt0816692", "tt1745960", "tt15398776", "tt10954984", "tt10293406"];
-            
-            // Cargar películas recomendadas
-            loadMovies('api-recommendations', recommendationIds, true);
-            
-            // Cargar películas en tendencia
-            loadMovies('api-trending', trendingIds, false);
-            
-            function loadMovies(containerId, movieIds, isRecommended) {
-                const container = document.getElementById(containerId);
-                let htmlContent = '';
-                
-                if (isRecommended) {
-                    htmlContent = '<div class="row">';
-                } else {
-                    htmlContent = '<div class="row" style="margin-bottom: 0;">';
-                }
-                
-                // Limitar a 4 películas para tendencias y 2 para recomendaciones
-                const limit = isRecommended ? 2 : 4;
-                const loadedIds = [];
-                
-                // Función recursiva para cargar películas hasta alcanzar el límite
-                function fetchNextMovie(index) {
-                    if (index >= movieIds.length || loadedIds.length >= limit) {
-                        if (isRecommended) {
-                            htmlContent += '</div>';
-                        } else {
-                            htmlContent += '</div>';
-                        }
-                        container.innerHTML = htmlContent;
-                        addMovieEvents();
-                        return;
-                    }
-                    
-                    const movieId = movieIds[index];
-                    
-                    fetch(`https://www.omdbapi.com/?i=${movieId}&apikey=${apiKey}`)
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.Response === "True") {
-                                loadedIds.push(movieId);
-                                
-                                if (isRecommended) {
-                                    htmlContent += createRecommendedMovieCard(data);
-                                } else {
-                                    htmlContent += createTrendingMovieCard(data);
-                                }
-                            }
-                            fetchNextMovie(index + 1);
-                        })
-                        .catch(error => {
-                            console.error("Error fetching movie data:", error);
-                            fetchNextMovie(index + 1);
-                        });
-                }
-                
-                fetchNextMovie(0);
+            if (isRecommended) {
+                htmlContent = '<div class="row">';
+            } else {
+                htmlContent = '<div class="row" style="margin-bottom: 0;">';
             }
             
-            function createRecommendedMovieCard(movieData) {
-                return `
-                    <div class="col s12 m6">
-                        <div class="recommended-movie z-depth-1 hoverable">
-                            <div class="movie-poster">
-                                <img src="${movieData.Poster !== "N/A" ? movieData.Poster : 'https://via.placeholder.com/300x450?text=No+Poster'}" class="responsive-img">
-                                <div class="movie-overlay">
-                                    <div class="movie-rating amber-text">
-                                        <i class="material-icons tiny">star</i> ${movieData.imdbRating !== "N/A" ? movieData.imdbRating : 'N/A'}
-                                    </div>
-                                    
+            const loadedIds = [];
+            
+            function fetchNextMovie(index) {
+                if (index >= movieIds.length || loadedIds.length >= limit) {
+                    if (isRecommended) {
+                        htmlContent += '</div>';
+                    } else {
+                        htmlContent += '</div>';
+                    }
+                    container.innerHTML = htmlContent;
+                    addMovieEvents();
+                    return;
+                }
+                
+                const movieId = movieIds[index];
+                
+                fetch(`https://www.omdbapi.com/?i=${movieId}&apikey=${apiKey}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.Response === "True") {
+                            loadedIds.push(movieId);
+                            
+                            if (isRecommended) {
+                                htmlContent += createRecommendedMovieCard(data);
+                            } else {
+                                htmlContent += createTrendingMovieCard(data);
+                            }
+                        }
+                        fetchNextMovie(index + 1);
+                    })
+                    .catch(error => {
+                        console.error("Error fetching movie data:", error);
+                        fetchNextMovie(index + 1);
+                    });
+            }
+            
+            fetchNextMovie(0);
+        }
+        
+        function createRecommendedMovieCard(movieData) {
+            const genres = movieData.Genre ? movieData.Genre.split(',').slice(0, 2).join(' • ') : 'Género no disponible';
+            const year = movieData.Year || 'Año no disponible';
+            
+            return `
+                <div class="col s12 m6 l4">
+                    <div class="recommended-movie z-depth-1 hoverable">
+                        <div class="movie-poster">
+                            <img src="${movieData.Poster !== "N/A" ? movieData.Poster : 'https://via.placeholder.com/300x450?text=No+Poster'}" 
+                                 alt="${movieData.Title}" class="responsive-img"
+                                 onerror="this.onerror=null;this.src='https://via.placeholder.com/300x450?text=Poster+No+Disponible';">
+                            <div class="movie-overlay">
+                                <div class="movie-rating amber-text">
+                                    <i class="material-icons tiny">star</i> ${movieData.imdbRating !== "N/A" ? movieData.imdbRating : 'N/A'}
+                                </div>
+                                <div class="movie-actions">
+                                    <a href="#!" class="btn-floating btn-small waves-effect waves-light red tooltipped" 
+                                       data-position="top" data-tooltip="Añadir a favoritos">
+                                        <i class="material-icons">favorite</i>
+                                    </a>
+                                    <a href="/pelicula/${movieData.imdbID}" class="btn-floating btn-small waves-effect waves-light blue tooltipped" 
+                                       data-position="top" data-tooltip="Ver detalles">
+                                        <i class="material-icons">info</i>
+                                    </a>
                                 </div>
                             </div>
-                            <div class="movie-info">
-                                <h5>${movieData.Title}</h5>
-                                <p class="truncate">${movieData.Genre}</p>
-                                <p class="match">${Math.floor(Math.random() * 30) + 70}% coincidencia con tus gustos</p>
+                        </div>
+                        <div class="movie-info">
+                            <h5 class="truncate">${movieData.Title}</h5>
+                            <p class="grey-text">${year} • ${genres}</p>
+                            <div class="match">
+                                <div class="progress light-blue lighten-4">
+                                    <div class="determinate light-blue" style="width: ${Math.floor(Math.random() * 30) + 70}%"></div>
+                                </div>
+                                <span>${Math.floor(Math.random() * 30) + 70}% de coincidencia</span>
                             </div>
                         </div>
                     </div>
-                `;
-            }
-            
-            function createTrendingMovieCard(movieData) {
-                return `
-                    <div class="col s6 m3">
-                        <div class="trending-movie hoverable">
-                            <img src="${movieData.Poster !== "N/A" ? movieData.Poster : 'https://via.placeholder.com/300x450?text=No+Poster'}" class="responsive-img z-depth-1">
-                            <p class="trending-title truncate">${movieData.Title}</p>
+                </div>
+            `;
+        }
+        
+        function createTrendingMovieCard(movieData) {
+            return `
+                <div class="col s6 m4 l2">
+                    <div class="trending-movie hoverable">
+                        <div class="card">
+                            <div class="card-image">
+                                <img src="${movieData.Poster !== "N/A" ? movieData.Poster : 'https://via.placeholder.com/300x450?text=No+Poster'}" 
+                                     alt="${movieData.Title}" class="responsive-img"
+                                     onerror="this.onerror=null;this.src='https://via.placeholder.com/300x450?text=Poster+No+Disponible';">
+                                <span class="card-title truncate">${movieData.Title}</span>
+                            </div>
+                            <div class="card-content" style="padding: 10px;">
+                                <p class="truncate">${movieData.Year || 'N/A'}</p>
+                                <p class="amber-text">
+                                    <i class="material-icons tiny">star</i> ${movieData.imdbRating !== "N/A" ? movieData.imdbRating : 'N/A'}
+                                </p>
+                            </div>
                         </div>
                     </div>
-                `;
-            }
+                </div>
+            `;
+        }
+        
+        function addMovieEvents() {
+            // Inicializar tooltips
+            const tooltips = document.querySelectorAll('.tooltipped');
+            M.Tooltip.init(tooltips);
             
-            function addMovieEvents() {
-                // Agregar eventos hover a las películas recomendadas
-                document.querySelectorAll('.recommended-movie').forEach(movie => {
-                    movie.addEventListener('mouseenter', function() {
-                        this.querySelector('.movie-overlay').style.opacity = '1';
-                    });
-                    
-                    movie.addEventListener('mouseleave', function() {
-                        this.querySelector('.movie-overlay').style.opacity = '0';
-                    });
+            // Agregar eventos hover
+            document.querySelectorAll('.recommended-movie').forEach(movie => {
+                movie.addEventListener('mouseenter', function() {
+                    this.querySelector('.movie-overlay').style.opacity = '1';
+                    this.style.transform = 'translateY(-5px)';
                 });
                 
-                // Agregar efecto hover a las películas en tendencia
-                document.querySelectorAll('.trending-movie').forEach(movie => {
-                    movie.addEventListener('mouseenter', function() {
-                        this.style.transform = 'translateY(-5px)';
-                    });
-                    
-                    movie.addEventListener('mouseleave', function() {
-                        this.style.transform = 'translateY(0)';
-                    });
+                movie.addEventListener('mouseleave', function() {
+                    this.querySelector('.movie-overlay').style.opacity = '0';
+                    this.style.transform = 'translateY(0)';
                 });
-            }
-        });
-    </script>
-
+            });
+            
+            document.querySelectorAll('.trending-movie').forEach(movie => {
+                movie.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-5px) scale(1.02)';
+                });
+                
+                movie.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0) scale(1)';
+                });
+            });
+        }
+    });
+</script>
 {% else %}
- <!-- Vista mejorada para usuarios no autenticados con hero section de fondo blanco -->
+    <!-- Vista mejorada para usuarios no autenticados con hero section de fondo blanco -->
     <div class="hero-section" style="background-color: #f2e5f4;">
         <div class="container">
             <div class="row valign-wrapper" style="min-height: 70vh;">
@@ -393,7 +486,7 @@
                 </div>
                 <div class="col s12 m5 hide-on-small-only">
                     <div class="feature-image z-depth-3">
-                        <img src="https://via.placeholder.com/500x400?text=Imagen+MovieHub" alt="MovieHub Feature" class="responsive-img" style="border-radius: 10px;">
+                        <img src="logopng.webp" alt="MovieHub Feature" class="responsive-img" style="border-radius: 10px;">
                     </div>
                 </div>
             </div>
