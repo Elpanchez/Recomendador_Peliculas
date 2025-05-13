@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-
+{% load static %}
 {% block title %}Inicio | MovieHub{% endblock %}
 
 {% block content %}
@@ -611,7 +611,7 @@
                 </div>
                 <div class="col s12 m5 hide-on-small-only">
                     <div class="feature-image z-depth-3">
-                        <img src="logopng.webp" alt="MovieHub Feature" class="responsive-img" style="border-radius: 10px;">
+                        <img src="{% static 'logopng.webp' %}" alt="MovieHub Feature" class="responsive-img" style="border-radius: 10px;">
                     </div>
                 </div>
             </div>
