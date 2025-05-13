@@ -146,34 +146,15 @@ def generos (request):
     return render(request, 'generos.html')
 
 @login_required
-def recomendaciones (request):
+def recomendaciones(request):
     # Obtener películas de la base de datos o usar valores predeterminados
     try:
         # Intentar obtener películas de la base de datos
         peliculas = Pelicula.objects.all()[:3]  # Limitar a 3 películas para la demostración
         
-        # Si no hay películas en la base de datos, crear recomendaciones predeterminadas
+        # Si no hay películas en la base de datos, no mostrar recomendaciones locales
         if not peliculas:
-            recomendaciones = [
-                {
-                    'id': 'default-11',
-                    'titulo': 'Buscando a Nemo',
-                    'descripcion': 'Un pez payaso sobreprotector que, junto a un pez cirujano con pérdida de memoria, busca a su hijo capturado.',
-                    'imagen': 'https://m.media-amazon.com/images/I/81montw1gVL._AC_UF1000,1000_QL80_.jpg'
-                },
-                {
-                    'id': 'default-12',
-                    'titulo': 'Parasitos',
-                    'descripcion': 'Una familia pobre se infiltra en el servicio de una familia rica, con consecuencias inesperadas.',
-                    'imagen': 'https://pics.filmaffinity.com/Parasite-406070218-large.jpg'
-                },
-                {
-                    'id': 'default-13',
-                    'titulo': 'Spiderman into the Spiderverse',
-                    'descripcion': 'Miles Morales se convierte en Spider-Man y conoce a otros Spider-People de diferentes dimensiones.',
-                    'imagen': 'https://m.media-amazon.com/images/I/A1GbxGqXCxL._AC_UF1000,1000_QL80_.jpg'
-                }
-            ]
+            recomendaciones = []
         else:
             # Convertir objetos Pelicula a diccionarios para la plantilla
             recomendaciones = []
@@ -185,27 +166,8 @@ def recomendaciones (request):
                     'imagen': pelicula.imagen_url
                 })
     except Exception as e:
-        # En caso de error, usar recomendaciones predeterminadas
-        recomendaciones = [
-            {
-                'id': 'default-11',
-                'titulo': 'Buscando a Nemo',
-                'descripcion': 'Un pez payaso sobreprotector que, junto a un pez cirujano con pérdida de memoria, busca a su hijo capturado.',
-                'imagen': 'https://m.media-amazon.com/images/I/81montw1gVL._AC_UF1000,1000_QL80_.jpg'
-            },
-            {
-                'id': 'default-12',
-                'titulo': 'Parasitos',
-                'descripcion': 'Una familia pobre se infiltra en el servicio de una familia rica, con consecuencias inesperadas.',
-                'imagen': 'https://pics.filmaffinity.com/Parasite-406070218-large.jpg'
-            },
-            {
-                'id': 'default-13',
-                'titulo': 'Spiderman into the Spiderverse',
-                'descripcion': 'Miles Morales se convierte en Spider-Man y conoce a otros Spider-People de diferentes dimensiones.',
-                'imagen': 'https://m.media-amazon.com/images/I/A1GbxGqXCxL._AC_UF1000,1000_QL80_.jpg'
-            }
-        ]
+        # En caso de error, no mostrar recomendaciones locales
+        recomendaciones = []
     
     return render(request, 'recomendaciones.html', {
         'recomendaciones': recomendaciones

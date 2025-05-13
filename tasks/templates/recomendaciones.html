@@ -5,84 +5,102 @@
     {% block content %}
     <div class="containerBox">
         <h3 class="center">Películas Recomendadas</h3>
-        <div class="row">
-            {% if recomendaciones %}
-                {% for pelicula in recomendaciones %}
-                    <div class="col s12 m4">
-                        <div class="card hoverable">
-                            <div class="card-image waves-effect waves-block waves-light">
-                                <img class="activator" src="{{ pelicula.imagen }}" alt="{{ pelicula.titulo }}">
-                            </div>
-                            <div class="card-content">
-                                <span class="card-title activator grey-text text-darken-4">{{ pelicula.titulo }}<i class="material-icons right">more_vert</i></span>
-                                <p><a href="#" class="purple-text text-darken-2">Ver detalles</a></p>
-                            </div>
-                            <div class="card-reveal">
-                                <span class="card-title grey-text text-darken-4">{{ pelicula.titulo }}<i class="material-icons right">close</i></span>
-                                <p>{{ pelicula.descripcion }}</p>
-                                <div class="card-action">
-                                    <form method="POST" action="{% url 'guardar_interaccion' %}">
-                                        {% csrf_token %}
-                                        <input type="hidden" name="pelicula" value="{{ pelicula.id }}">
-                                        <input type="hidden" name="accion" value="guardar">
-                                        <button type="submit" class="btn-small purple darken-1 waves-effect waves-light">Agregar a favoritos</button>
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                {% endfor %}
-            {% else %}
-                <div class="col s12 center">
-                    <p>No hay recomendaciones disponibles en este momento.</p>
-                </div>
-            {% endif %}
+        <div class="row" style="align-items: stretch;" id="peliculas-container">
+            <!-- Las películas de la API se cargarán aquí -->
         </div>
     </div>
 
     <style>
-        /* Animación para las tarjetas */
         .card {
             transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
-        
+
         .card:hover {
             transform: translateY(-10px);
             box-shadow: 0 15px 25px rgba(0, 0, 0, 0.2);
         }
+
+        .contenido-expandible {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease;
+        }
+
+        .contenido-expandible.expandido {
+            max-height: 500px;
+        }
     </style>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Configurar botones de formulario para mostrar toast y luego enviar
-            var formBtns = document.querySelectorAll('form button.btn-small');
-            formBtns.forEach(function(btn) {
-                btn.addEventListener('click', function(e) {
-                    // Prevenir envío inmediato
-                    e.preventDefault();
+        document.addEventListener('DOMContentLoaded', function () {
+            // OMDb API - Películas aleatorias
+            const apiKey = "a5c892bf";
+            const movieIds = ["tt0111161", "tt0068646", "tt0468569", "tt1375666", "tt0109830", "tt0137523", "tt0120737", "tt0167260", "tt0080684", "tt0133093", "tt0076759", "tt0102926", "tt0110357", "tt0120815", "tt0245429"];
+
+            function crearTarjetaAPI(data) {
+                return `
+                    <div class="col s12 m4">
+                        <div class="card hoverable" style="height: 100%; display: flex; flex-direction: column; justify-content: space-between;">
+                            <div class="card-image waves-effect waves-block waves-light">
+                                <img src="${data.Poster}" alt="${data.Title}">
+                            </div>
+                            <div class="card-content">
+                                <span class="card-title grey-text text-darken-4">${data.Title}</span>
+                                <p><a href="#!" class="purple-text text-darken-2 toggle-detalles">Ver detalles</a></p>
+                                <div class="detalles contenido-expandible">
+                                    <div class="contenido-detalles">
+                                        <p><strong>Género:</strong> ${data.Genre}</p>
+                                        <p><strong>Clasificación:</strong> ${data.Rated}</p>
+                                        <p><strong>Nota General:</strong> ${data.imdbRating}</p>
+                                        <p><strong>Director:</strong> ${data.Director}</p>
+                                        <p>${data.Plot}</p>
+                                        <button class="btn-small purple darken-1 waves-effect waves-light" disabled>Solo visualización</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            function cargarPeliculasAPI() {
+                const contenedor = document.getElementById('peliculas-container');
+                const usados = new Set();
+                
+                // Cargar 3 películas aleatorias
+                for (let i = 0; i < 3; i++) {
+                    let randomId;
+                    do {
+                        randomId = movieIds[Math.floor(Math.random() * movieIds.length)];
+                    } while (usados.has(randomId));
+                    usados.add(randomId);
                     
-                    // Obtener el formulario y el título de la película
-                    var form = this.closest('form');
-                    var title = this.closest('.card-reveal').querySelector('.card-title').textContent.replace('close', '').trim();
-                    
-                    // Mostrar toast de confirmación
-                    M.toast({
-                        html: '<i class="material-icons left">favorite</i> "' + title + '" añadida a favoritos',
-                        classes: 'rounded purple darken-1',
-                        displayLength: 1000
-                    });
-                    
-                    // Enviar el formulario después de un breve retraso para que se vea el toast
-                    setTimeout(function() {
-                        form.submit();
-                    }, 1000);
-                });
-            });
+                    fetch(`https://www.omdbapi.com/?i=${randomId}&apikey=${apiKey}`)
+                        .then(res => res.json())
+                        .then(data => {
+                            if (data.Response === "True") {
+                                contenedor.innerHTML += crearTarjetaAPI(data);
+                                
+                                // Agregar eventos a los nuevos elementos
+                                document.querySelectorAll('.toggle-detalles').forEach(link => {
+                                    link.addEventListener('click', function (e) {
+                                        e.preventDefault();
+                                        const detalles = this.closest('.card-content').querySelector('.contenido-expandible');
+                                        detalles.classList.toggle('expandido');
+                                        this.textContent = detalles.classList.contains('expandido') ? 'Ocultar detalles' : 'Ver detalles';
+                                    });
+                                });
+                            }
+                        })
+                        .catch(err => console.error("Error cargando película aleatoria:", err));
+                }
+            }
+
+            cargarPeliculasAPI();
         });
     </script>
     {% endblock %}
 {% else %}
-    <!-- Si no está autenticado, mostrar mensaje para iniciar sesión -->
     <div class="Container">
         <h3 class="titleText">Acceso Restringido</h3>
         <p>Debes iniciar sesión para explorar los géneros de películas.</p>
