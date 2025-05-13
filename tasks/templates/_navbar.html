@@ -10,16 +10,6 @@
       <li><a href="{% url 'recomendaciones' %}" class="nav-link-animated">Recomendaciones</a></li>
       <li><a href="{% url 'peliculasFavoritas' %}" class="nav-link-animated">Mis Favoritas</a></li>
       
-      <li class="dropdown-trigger-hover">
-        <a href="#!" class="dropdown-trigger nav-link-animated" data-target="dropdown-tasks">
-          Tareas<i class="material-icons right">arrow_drop_down</i>
-        </a>
-        <ul id="dropdown-tasks" class="dropdown-content purple lighten-5">
-          <li><a href="{% url 'tasks' %}" class="purple-text text-darken-4">Tareas Pendientes</a></li>
-          <li><a href="{% url 'tasks_completed' %}" class="purple-text text-darken-4">Tareas Completadas</a></li>
-          <li><a href="{% url 'create_task' %}" class="purple-text text-darken-4">Crear Tarea</a></li>
-        </ul>
-      </li>
       
       <li><a href="{% url 'logout' %}" class="nav-link-animated">Cerrar Sesión</a></li>
       {% else %}
