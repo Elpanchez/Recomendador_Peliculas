@@ -379,8 +379,305 @@
             }
         });
     </script>
+
 {% else %}
-    <!-- Vista para usuarios no autenticados (se mantiene igual) -->
-    <!-- ... (todo el contenido existente para usuarios no autenticados) ... -->
+ <!-- Vista mejorada para usuarios no autenticados con hero section de fondo blanco -->
+    <div class="hero-section" style="background-color: #f2e5f4;">
+        <div class="container">
+            <div class="row valign-wrapper" style="min-height: 70vh;">
+                <div class="col s12 m7">
+                    <h1 class="header purple-text text-darken-2">MovieHub</h1>
+                    <h3 class="flow-text">Tu destino para descubrir películas increíbles</h3>
+                    <p class="flow-text">Recomendaciones personalizadas, reseñas y mucho más. Únete hoy y encuentra tu próxima película favorita.</p>
+                    <div class="action-buttons">
+                        <a href="{% url 'signin' %}" class="btn-large waves-effect waves-light purple darken-1 hoverable z-depth-2">
+                            <i class="material-icons left">login</i>Iniciar Sesión
+                        </a>
+                        <a href="{% url 'signup' %}" class="btn-large waves-effect waves-light deep-purple lighten-1 hoverable z-depth-2" style="margin-left: 10px;">
+                            <i class="material-icons left">person_add</i>Registrarse
+                        </a>
+                    </div>
+                </div>
+                <div class="col s12 m5 hide-on-small-only">
+                    <div class="feature-image z-depth-3">
+                        <img src="https://via.placeholder.com/500x400?text=Imagen+MovieHub" alt="MovieHub Feature" class="responsive-img" style="border-radius: 10px;">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Features section -->
+    <div class="section white">
+        <div class="container">
+            <div class="row center">
+                <h4 class="section-title purple-text text-darken-3">¿Por qué unirte a MovieHub?</h4>
+            </div>
+            <div class="row">
+                <div class="col s12 m4">
+                    <div class="card-panel hoverable z-depth-1">
+                        <div class="center">
+                            <i class="material-icons medium purple-text">thumb_up</i>
+                            <h5>Recomendaciones Personalizadas</h5>
+                            <p>Algoritmo único que aprende de tus gustos para recomendarte películas que amarás.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col s12 m4">
+                    <div class="card-panel hoverable z-depth-1">
+                        <div class="center">
+                            <i class="material-icons medium purple-text">favorite</i>
+                            <h5>Guarda tus Favoritos</h5>
+                            <p>Crea colecciones de películas favoritas y accede a ellas desde cualquier dispositivo.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col s12 m4">
+                    <div class="card-panel hoverable z-depth-1">
+                        <div class="center">
+                            <i class="material-icons medium purple-text">rate_review</i>
+                            <h5>Comparte tus Opiniones</h5>
+                            <p>Escribe reseñas, califica películas y conecta con otros cinéfilos.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Featured movies carousel with improved styling -->
+    <div class="section" style="background-color: #f2e5f4; margin-bottom: 50px; padding-top: 20px;">
+        <div class="container" style="max-width: 800px;">
+            <div class="row" style="margin-bottom: 20px;">
+                <h4 class="center-align purple-text text-darken-2">Películas Destacadas</h4>
+                <p class="center-align">Descubre las películas más populares que puedes explorar al unirte</p>
+            </div>
+            <div class="carousel center-align" style="margin: 0 auto;">
+                <a class="carousel-item movie-poster" href="#one!">
+                    <div class="movie-card-container">
+                        <div class="poster-container z-depth-2">
+                            <img src="https://pics.filmaffinity.com/Oppenheimer-828933592-large.jpg" alt="Oppenheimer">
+                        </div>
+                        <div class="poster-info">
+                            <h5>Oppenheimer</h5>
+                            <div class="rating amber-text">★★★★★ 9.5/10</div>
+                        </div>
+                    </div>
+                </a>
+                <a class="carousel-item movie-poster" href="#two!">
+                    <div class="movie-card-container">
+                        <div class="poster-container z-depth-2">
+                            <img src="https://m.media-amazon.com/images/M/MV5BNjU3N2QxNzYtMjk1NC00MTc4LTk1NTQtMmUxNTljM2I0NDA5XkEyXkFqcGdeQXVyODE5NzE3OTE@._V1_.jpg" alt="Barbie" onerror="this.onerror=null;this.src='https://via.placeholder.com/300x450?text=Barbie';">
+                        </div>
+                        <div class="poster-info">
+                            <h5>Barbie</h5>
+                            <div class="rating amber-text">★★★★☆ 8.7/10</div>
+                        </div>
+                    </div>
+                </a>
+                <a class="carousel-item movie-poster" href="#three!">
+                    <div class="movie-card-container">
+                        <div class="poster-container z-depth-2">
+                            <img src="https://pics.filmaffinity.com/Dune-209834814-large.jpg" alt="Dune">
+                        </div>
+                        <div class="poster-info">
+                            <h5>Dune</h5>
+                            <div class="rating amber-text">★★★★☆ 8.9/10</div>
+                        </div>
+                    </div>
+                </a>
+                <a class="carousel-item movie-poster" href="#four!">
+                    <div class="movie-card-container">
+                        <div class="poster-container z-depth-2">
+                            <img src="https://m.media-amazon.com/images/M/MV5BNGIyYWMzNjktNDE3MC00YWQyLWEyMmEtN2ZmNzZhZDk3NGJlXkEyXkFqcGdeQXVyMTUzMTg2ODkz._V1_.jpg" alt="Poor Things" onerror="this.onerror=null;this.src='https://via.placeholder.com/300x450?text=Poor+Things';">
+                        </div>
+                        <div class="poster-info">
+                            <h5>Poor Things</h5>
+                            <div class="rating amber-text">★★★★☆ 8.8/10</div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Testimonials section -->
+    <div class="section white" style="padding-top: 50px; margin-top: 50px;">
+        <div class="container">
+            <div class="row center">
+                <h4 class="purple-text text-darken-2">Lo que dicen nuestros usuarios</h4>
+            </div>
+            <div class="row">
+                <div class="col s12 m4">
+                    <div class="card-panel grey lighten-5 z-depth-1">
+                        <div class="row valign-wrapper">
+                            <div class="col s3">
+                                <img src="https://via.placeholder.com/60x60?text=U" alt="" class="circle responsive-img">
+                            </div>
+                            <div class="col s9">
+                                <span class="black-text">
+                                    "MovieHub me ha ayudado a descubrir joyas del cine que nunca hubiera encontrado por mi cuenta."
+                                </span>
+                                <p class="purple-text">- Laura M.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col s12 m4">
+                    <div class="card-panel grey lighten-5 z-depth-1">
+                        <div class="row valign-wrapper">
+                            <div class="col s3">
+                                <img src="https://via.placeholder.com/60x60?text=U" alt="" class="circle responsive-img">
+                            </div>
+                            <div class="col s9">
+                                <span class="black-text">
+                                    "Las recomendaciones son increíblemente precisas. ¡Cada fin de semana tengo una nueva película para ver!"
+                                </span>
+                                <p class="purple-text">- Carlos P.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col s12 m4">
+                    <div class="card-panel grey lighten-5 z-depth-1">
+                        <div class="row valign-wrapper">
+                            <div class="col s3">
+                                <img src="https://via.placeholder.com/60x60?text=U" alt="" class="circle responsive-img">
+                            </div>
+                            <div class="col s9">
+                                <span class="black-text">
+                                    "La comunidad de MovieHub es genial. He conocido personas con mis mismos gustos cinematográficos."
+                                </span>
+                                <p class="purple-text">- Marta T.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Call to action -->
+    <div class="section purple darken-3 white-text center">
+        <div class="container">
+            <h4>¿Listo para descubrir tu próxima película favorita?</h4>
+            <p class="flow-text">Únete a miles de usuarios que ya disfrutan de MovieHub</p>
+            <a href="{% url 'signup' %}" class="btn-large waves-effect waves-light pink accent-2 pulse hoverable z-depth-2">
+                <i class="material-icons left">movie_filter</i>Comenzar Ahora - ¡Es Gratis!
+            </a>
+        </div>
+    </div>
+
+    <!-- Scripts para el carousel mejorado -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Inicializar carousel con 4 elementos visibles
+            var carousel = document.querySelectorAll('.carousel');
+            var instances = M.Carousel.init(carousel, {
+                dist: 0,
+                padding: 10,
+                numVisible: 4, // Mostrar 4 películas visibles
+                indicators: true,
+                duration: 200
+            });
+
+            // Auto-rotar el carrusel
+            setInterval(function() {
+                var el = document.querySelector('.carousel');
+                var instance = M.Carousel.getInstance(el);
+                instance.next();
+            }, 5000);
+        });
+    </script>
+
+    <style>
+        /* Estilos adicionales para mejorar la apariencia */
+        .hero-section {
+            padding: 50px 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .header {
+            font-weight: 500;
+            margin-bottom: 20px;
+        }
+        
+        .action-buttons {
+            margin-top: 30px;
+        }
+        
+        .section-title {
+            margin-bottom: 40px;
+            font-weight: 300;
+        }
+        
+        .feature-image {
+            border: 5px solid #f5f5f5;
+            box-shadow: 0 6px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Ajustes para el carrusel */
+        .carousel {
+            height: 400px !important; /* Reducir la altura del carrusel */
+            perspective: 1000px;
+            overflow: visible;
+            margin-bottom: 20px; /* Reducir el espaciado inferior */
+        }
+
+        .carousel .carousel-item {
+            width: 250px !important; /* Reducir el ancho de los elementos */
+            opacity: 1 !important;
+        }
+
+        .movie-card-container {
+            width: 250px; /* Ajustar el ancho del contenedor */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .poster-container {
+            width: 250px; /* Ajustar el ancho del póster */
+            height: 375px; /* Mantener proporción 2:3 */
+            border-radius: 8px;
+            overflow: hidden;
+            transition: transform 0.3s ease;
+        }
+
+        .poster-container:hover {
+            transform: scale(1.05);
+        }
+
+        .poster-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+
+        .poster-info {
+            width: 100%;
+            padding: 10px;
+            text-align: center;
+        }
+
+        .poster-info h5 {
+            margin: 5px 0;
+            color: #7b1fa2;
+            font-weight: 500;
+        }
+
+        .rating {
+            margin-top: 5px;
+            font-weight: bold;
+        }
+        
+        /* Añadir efecto hover a las tarjetas */
+        .card.hoverable:hover {
+            transform: translateY(-5px);
+            transition: transform 0.3s ease;
+        }
+    </style>
+
 {% endif %}
 {% endblock %}
