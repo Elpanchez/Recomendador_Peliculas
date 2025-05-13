@@ -9,9 +9,15 @@ from .models import Task
 
 from .forms import TaskForm
 #para cambiar el password
-from .forms import UserUpdateForm
+from django.contrib.auth.forms import UserChangeForm
 from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth import update_session_auth_hash
+from .models import Usuario
+from .forms import UsuarioUpdateForm, CambiarContrasenaForm
+from .models import Usuario
+from django.contrib import messages
+from django.shortcuts import render, redirect
+
 
 # Create your views here.
 
@@ -640,61 +646,41 @@ def update_review(request, review_id):
 #Configurar perfil
 @login_required
 def configurar_perfil(request):
-    # Obtener ambos modelos de favoritos
-    favoritos_interaccion = Interaccion.objects.filter(
-        user=request.user, 
-        accion='guardar'
-    ).select_related('pelicula')
+    # Obtener el usuario autenticado
+    usuario = request.user  # Esto debería ser tu modelo Usuario personalizado
     
-    favoritos_model = Favorito.objects.filter(
-        usuario=request.user
-    ).select_related('pelicula')
-
     if request.method == 'POST':
-        user_form = UserUpdateForm(request.POST, instance=request.user)
-        password_form = PasswordChangeForm(request.user, request.POST)
-        
         if 'update_profile' in request.POST:
+            user_form = UsuarioUpdateForm(request.POST, instance=usuario)
+            password_form = CambiarContrasenaForm()
+
             if user_form.is_valid():
                 user_form.save()
-                messages.success(request, 'Tu perfil ha sido actualizado!')
+                messages.success(request, 'Perfil actualizado correctamente!')
                 return redirect('configurar_perfil')
-                
+        
         elif 'change_password' in request.POST:
+            password_form = CambiarContrasenaForm(request.POST)
+            user_form = UsuarioUpdateForm(instance=usuario)
+
             if password_form.is_valid():
-                user = password_form.save()
-                update_session_auth_hash(request, user)  # Importante para no desloguear
-                messages.success(request, 'Tu contraseña ha sido cambiada!')
-                return redirect('configurar_perfil')
-            else:
-                messages.error(request, 'Por favor corrige los errores.')
+                if not usuario.check_password(password_form.cleaned_data['old_password']):
+                    password_form.add_error('old_password', 'La contraseña actual es incorrecta')
+                else:
+                    usuario.set_password(password_form.cleaned_data['new_password1'])
+                    usuario.save()
+                    update_session_auth_hash(request, usuario)  # Mantener la sesión
+                    messages.success(request, 'Contraseña cambiada exitosamente!')
+                    return redirect('configurar_perfil')
     else:
-        user_form = UserUpdateForm(instance=request.user)
-        password_form = PasswordChangeForm(request.user)
+        user_form = UsuarioUpdateForm(instance=usuario)
+        password_form = CambiarContrasenaForm()
 
-    context = {
+    return render(request, 'configurar_perfil.html', {
         'user_form': user_form,
-        'password_form': password_form,
-        'favoritos_interaccion': favoritos_interaccion,
-        'favoritos_model': favoritos_model,
-    }
-    
-    return render(request, 'configurar_perfil.html', context)
+        'password_form': password_form
+    })
 
-
-@login_required
-def eliminar_favorito(request, pelicula_id):
-    """Elimina favorito del modelo Interaccion"""
-    if request.method == 'POST':
-        favorito = get_object_or_404(
-            Interaccion, 
-            user=request.user, 
-            pelicula_id=pelicula_id, 
-            accion='guardar'
-        )
-        favorito.delete()
-        messages.success(request, 'Película eliminada de favoritos')
-    return redirect('configurar_perfil')
 
 @login_required
 def eliminar_favorito_modelo(request, favorito_id):

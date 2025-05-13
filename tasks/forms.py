@@ -3,6 +3,7 @@ from .models import Task
 from django import forms
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import PasswordChangeForm
+from .models import Usuario
 
 class TaskForm(ModelForm):
     class Meta:
@@ -22,18 +23,14 @@ class ReseñaForm(forms.ModelForm):
         }
 
         #Aqui acaba
-
-class UserUpdateForm(forms.ModelForm):
+class UsuarioUpdateForm(forms.ModelForm):
     class Meta:
-        model = User
-        fields = ['first_name', 'last_name', 'email']
+        model = Usuario
+        fields = ['nombre']
         labels = {
-            'first_name': 'Nombre',
-            'last_name': 'Apellido',
-            'email': 'Correo electrónico'
+            'nombre': 'Nuevo Nombre',
         }
-        widgets = {
-            'first_name': forms.TextInput(attrs={'class': 'form-control'}),
-            'last_name': forms.TextInput(attrs={'class': 'form-control'}),
-            'email': forms.EmailInput(attrs={'class': 'form-control'})
-        }
+class CambiarContrasenaForm(forms.Form):
+    old_password = forms.CharField(widget=forms.PasswordInput, label='Contraseña actual')
+    new_password1 = forms.CharField(widget=forms.PasswordInput, label='Nueva contraseña')
+    new_password2 = forms.CharField(widget=forms.PasswordInput, label='Confirmar nueva contraseña')

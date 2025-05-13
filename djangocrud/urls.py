@@ -52,8 +52,9 @@ urlpatterns = [
     path('pelicula/<str:pelicula_id>/', views.detalle_pelicula, name='detalle_pelicula'),
     path('favoritos/eliminar/<str:pelicula_id>/', eliminar_favorito, name='eliminar_favorito'),
     path('configurar-perfil/', configurar_perfil, name='configurar_perfil'),
-    path('favoritos/eliminar/<int:pelicula_id>/', eliminar_favorito, name='eliminar_favorito'),
-    path('favoritos-modelo/eliminar/<int:favorito_id>/', eliminar_favorito_modelo, name='eliminar_favorito_modelo'),
+    path('favoritos/eliminar/<str:pelicula_id>/', eliminar_favorito, name='eliminar_favorito'),
+    path('favoritos-modelo/eliminar/<int:favorito_id>/', 
+         eliminar_favorito_modelo, name='eliminar_favorito_modelo'),
 ]
 
 if settings.DEBUG:  # Solo en modo desarrollo
