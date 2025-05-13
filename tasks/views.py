@@ -253,12 +253,11 @@ def guardar_interaccion(request):
     if request.method == 'POST':
         pelicula_id = request.POST.get('pelicula')
         accion = request.POST.get('accion')
-        usuario_id = request.user.id  # Get the logged in user
+        usuario_id = request.user.id
         
         try:
-            # Verificar si es un ID por defecto (default-1, default-2, etc.)
+            # Si es una película por defecto
             if pelicula_id.startswith('default-'):
-                # Usar películas de muestra
                 titulos_muestra = {
                     'default-1': 'Interestelar',
                     'default-2': 'Titanic',
@@ -276,7 +275,6 @@ def guardar_interaccion(request):
                 }
                 titulo_pelicula = titulos_muestra.get(pelicula_id, 'Película Desconocida')
                 
-                # Registrar directamente en la tabla de interacciones
                 nueva_interaccion = Interaccion(
                     user=request.user,
                     pelicula_id=pelicula_id,
@@ -285,69 +283,58 @@ def guardar_interaccion(request):
                     calificacion=request.POST.get('calificacion', None)
                 )
                 nueva_interaccion.save()
+            
             else:
-                # Intentar obtener la película de la base de datos
-                try:
-                    pelicula = Pelicula.objects.get(id=pelicula_id)
-                    
-                    if accion == 'reseñar':
-                        # Guardar reseña
-                        comentario = request.POST.get('reseña')
-                        nueva_reseña = Reseña(
-                            pelicula_id=pelicula.id,
-                            comentario=comentario,
-                            fecha_creacion=datetime.now()
-                        )
-                        nueva_reseña.save()
-                        
-                    elif accion == 'calificar':
-                        # Guardar calificación
-                        calificacion_valor = request.POST.get('calificacion')
-                        nueva_calificacion = Calificacion(
-                            pelicula_id=pelicula.id,
-                            calificacion=calificacion_valor
-                        )
-                        nueva_calificacion.save()
-                        
-                    elif accion == 'guardar':
-                        # Guardar como favorito
-                        nuevo_favorito = Favoritos(
-                            pelicula_id=pelicula.id,
-                            usuario_id=usuario_id,
-                            fecha_agregado=datetime.now()
-                        )
-                        nuevo_favorito.save()
-                    
-                    # También registrar en la tabla de interacciones
-                    nueva_interaccion = Interaccion(
-                        user=request.user,
-                        pelicula_id=pelicula_id,
-                        accion=accion,
-                        reseña=request.POST.get('reseña', ''),
-                        calificacion=request.POST.get('calificacion', None)
+                # Intentar obtener la película según el tipo de ID
+                pelicula = None
+                if pelicula_id.startswith('tt'):
+                    pelicula = Pelicula.objects.get(imdb_id=pelicula_id)
+                elif pelicula_id.isdigit():
+                    pelicula = Pelicula.objects.get(id=int(pelicula_id))
+                else:
+                    raise ValueError("Formato de ID no válido.")
+
+                # Guardar reseña, calificación o favorito según la acción
+                if accion == 'reseñar':
+                    comentario = request.POST.get('reseña')
+                    nueva_reseña = Reseña(
+                        pelicula_id=pelicula.id,
+                        comentario=comentario,
+                        fecha_creacion=datetime.now()
                     )
-                    nueva_interaccion.save()
-                
-                except Pelicula.DoesNotExist:
-                    # Si la película no existe, solo guardar la interacción
-                    nueva_interaccion = Interaccion(
-                        user=request.user,
-                        pelicula_id=pelicula_id,
-                        accion=accion,
-                        reseña=request.POST.get('reseña', ''),
-                        calificacion=request.POST.get('calificacion', None)
+                    nueva_reseña.save()
+
+                elif accion == 'calificar':
+                    calificacion_valor = request.POST.get('calificacion')
+                    nueva_calificacion = Calificacion(
+                        pelicula_id=pelicula.id,
+                        calificacion=calificacion_valor
                     )
-                    nueva_interaccion.save()
-            
-            # Redirigir con parámetros para mostrar confirmación
+                    nueva_calificacion.save()
+
+                elif accion == 'guardar':
+                    nuevo_favorito = Favoritos(
+                        pelicula_id=pelicula.id,
+                        usuario_id=usuario_id,
+                        fecha_agregado=datetime.now()
+                    )
+                    nuevo_favorito.save()
+
+                nueva_interaccion = Interaccion(
+                    user=request.user,
+                    pelicula_id=pelicula_id,
+                    accion=accion,
+                    reseña=request.POST.get('reseña', ''),
+                    calificacion=request.POST.get('calificacion', None)
+                )
+                nueva_interaccion.save()
+
             return redirect(f'/peliculasFavoritas?success=true&action={accion}&movie={pelicula_id}')
-            
+
         except Exception as e:
-            # Manejar errores
             messages.error(request, f"Error al guardar: {str(e)}")
             return redirect('peliculasFavoritas')
-    
-    # Si no es POST, redirigir a la página de favoritos
+
     return redirect('peliculasFavoritas')
 
 

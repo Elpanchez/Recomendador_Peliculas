@@ -8,6 +8,7 @@ class Pelicula(models.Model):
     titulo = models.CharField(max_length=255)
     descripcion = models.TextField(null=True, blank=True)
     imagen = models.URLField(default="https://via.placeholder.com/150")  # Agrega un valor por defecto
+    imdb_id = models.CharField(max_length=15, unique=True, null=True, blank=True)
 
 
 class Reseña(models.Model):
