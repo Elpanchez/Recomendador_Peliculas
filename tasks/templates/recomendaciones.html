@@ -35,18 +35,56 @@
         document.addEventListener('DOMContentLoaded', function () {
             // OMDb API - Películas aleatorias
             const apiKey = "a5c892bf";
-            const movieIds = [
-            "tt0111161", "tt0068646", "tt0468569", "tt1375666", "tt0109830",
-            "tt0137523", "tt0120737", "tt0167260", "tt0080684", "tt0133093",
-            "tt0076759", "tt0102926", "tt0110357", "tt0120815", "tt0245429",
-            "tt0114369", "tt0108052", "tt0169547", "tt0816692", "tt0110413",
-            "tt0107290", "tt0172495", "tt0120689", "tt0120586", "tt0364569",
-            "tt0103064", "tt0088763", "tt0120735", "tt0338013", "tt0118799",
-            "tt0266543", "tt0114709", "tt1853728", "tt0114814", "tt0120382",
-            "tt0167404", "tt0107048", "tt0180093", "tt0407887", "tt0209144",
-            "tt0119217", "tt0034583", "tt0105236", "tt0137523", "tt0113277"
-        ];
-
+    const movieIds = [
+    // Drama/Thrillers
+    "tt4154756", // Avengers: Infinity War (2018)
+    "tt4154796", // Avengers: Endgame (2019)
+    "tt10872600", // Spider-Man: No Way Home (2021)
+    "tt0816692", // Interstellar (2014)
+    "tt1853728", // Django Unchained (2012)
+    
+    // Ciencia Ficción
+    "tt2543164", // Arrival (2016)
+    "tt1677720", // Ready Player One (2018)
+    "tt3659388", // The Martian (2015)
+    "tt1211837", // Doctor Strange (2016)
+    "tt2316204", // Alien: Covenant (2017)
+    
+    // Acción/Aventura
+    "tt3498820", // Captain America: Civil War (2016)
+    "tt2250912", // Spider-Man: Homecoming (2017)
+    "tt6320628", // Spider-Man: Far From Home (2019)
+    "tt0371746", // Iron Man (2008)
+    "tt0458339", // Captain America: The First Avenger (2011)
+    
+    // Drama/Romance
+    "tt10380768", // La La Land (2016)
+    "tt3104988", // Crazy Rich Asians (2018)
+    "tt3281548", // Little Women (2019)
+    "tt4555426", // Call Me By Your Name (2017)
+    "tt1020558", // The Big Sick (2017)
+    
+    // Terror/Suspenso
+    "tt10919380", // Hereditary (2018)
+    "tt6857112", // Us (2019)
+    "tt6644200", // A Quiet Place (2018)
+    "tt6537238", // The Invisible Man (2020)
+    "tt9016974", // Scary Stories to Tell in the Dark (2019)
+    
+    // Animación
+    "tt2245084", // Big Hero 6 (2014)
+    "tt2948356", // Zootopia (2016)
+    "tt2380307", // Coco (2017)
+    "tt6105098", // The Lion King (2019)
+    "tt7975244", // Jumanji: The Next Level (2019)
+    
+    // Comedia
+    "tt1431045", // Deadpool (2016)
+    "tt1637725", // Ted (2012)
+    "tt1386697", // Suicide Squad (2016)
+    "tt4972582", // Split (2016)
+    "tt3794354"  // Sonic the Hedgehog (2020)
+];
 
             function crearTarjetaAPI(data) {
                 return `
