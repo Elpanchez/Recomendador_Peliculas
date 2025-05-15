@@ -133,5 +133,5 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 LOGIN_REDIRECT_URL = 'tasks'
 LOGOUT_REDIRECT_URL = 'home'
 
-#ALLOWED_HOSTS = ['localhost','recomendadorpeliculas-production.up.railway.app']
-#ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['localhost','recomendadorpeliculas-production.up.railway.app']
+ALLOWED_HOSTS = ['*']
