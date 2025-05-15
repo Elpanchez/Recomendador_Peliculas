@@ -135,3 +135,5 @@ LOGOUT_REDIRECT_URL = 'home'
 
 ALLOWED_HOSTS = ['localhost','recomendadorpeliculas-production.up.railway.app']
 ALLOWED_HOSTS = ['*']
+
+CSRF_TRUSTED_ORIGINS = ['http://*','recomendadorpeliculas-production.up.railway.app']
